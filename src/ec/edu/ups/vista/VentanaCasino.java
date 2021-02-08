@@ -1,0 +1,466 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package ec.edu.ups.vista;
+
+import ec.edu.ups.controlador.ControladorApostar;
+import ec.edu.ups.controlador.ControladorBanca;
+import ec.edu.ups.controlador.ControladorJugador;
+import ec.edu.ups.modelo.Apostar;
+import ec.edu.ups.modelo.Banca;
+import ec.edu.ups.modelo.EnumTipoDeApuesta;
+import ec.edu.ups.modelo.Jugador;
+import ec.edu.ups.modelo.Jugar;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import javax.swing.table.DefaultTableModel;
+import org.glassfish.hk2.utilities.reflection.Logger;
+
+/**
+ *
+ * @author NANCY
+ */
+public class VentanaCasino extends javax.swing.JInternalFrame {
+
+    private List<Jugador> listaNumero;
+    private List<Jugador> parImpar;
+    private List<Jugador> martingala;
+    private List<Jugador> listaJugadores;
+    private List<Jugar> jugar;
+    private List<Thread> listaHilos;
+    private ControladorBanca controladorBanca;
+    private ControladorJugador controladorJugador;
+    private ControladorApostar controladorApostar;
+    
+    int numeroGanador;
+    /**
+     * Creates new form VentanaCasino
+     * @param controladorApostar
+     * @param controladorBanca
+     * @param controladorJugador
+     */
+    public VentanaCasino(ControladorApostar controladorApostar, ControladorBanca controladorBanca, ControladorJugador controladorJugador) {
+        initComponents();
+        
+        this.controladorApostar = controladorApostar;
+        this.controladorBanca = controladorBanca;
+        this.controladorJugador = controladorJugador;
+        listaNumero = new ArrayList();
+        parImpar = new ArrayList();
+        martingala = new ArrayList();
+        listaJugadores = new ArrayList();
+        jugar = new ArrayList();
+        listaHilos = new ArrayList();
+        cargarDatosJuego(jugar);
+    }
+
+    public int getNumeroGanador() {
+        return numeroGanador;
+    }
+
+    public void setNumeroGanador(int numeroGanador) {
+        this.numeroGanador = numeroGanador;
+    }
+    
+    public void agregarNumero(Jugador jugador){
+        listaNumero.add(jugador);
+    }
+    public void agregarParImpar(Jugador jugador){
+        parImpar.add(jugador);
+    }
+    public void agregarMartingala(Jugador jugador){
+        martingala.add(jugador);
+    }
+
+    public void crearApuesta(List<Jugar> juego){
+        juego.forEach(ju->{
+            ju.getApuestas().forEach(ap->{
+                controladorApostar.crear(ap);
+            });
+        });
+    }
+    
+    public void actualizarJugador(List<Jugar> juego){
+        juego.forEach(ju->{
+            ju.getApuestas().forEach(ap->{
+                controladorJugador.actualizar(ap.getCodigoJugadorFk());
+                
+            });
+        });
+    }
+    
+    public void ActualizarBanca(List<Jugar> juego){
+        var banca = juego.get(juego.size()-1).getBanca();
+        controladorBanca.actualizar(banca);
+    }
+    
+    public void cargarDatosApostadores() {
+       DefaultTableModel modeloTabla = (DefaultTableModel) tblApostadores.getModel();
+
+        modeloTabla.setRowCount(0);
+        for (Jugador jugador : listaJugadores) {
+            Object[] rowData = {jugador.getId(),jugador.getNombre(),jugador.getTipoapuesta()};
+            modeloTabla.addRow(rowData);
+        }
+        tblApostadores.setModel(modeloTabla);
+    }
+    
+    public int sacarNumero(){
+        setNumeroGanador((int)(Math.random()*36));
+        return getNumeroGanador();
+    }
+    
+    public void cargarDatosJuego(List<Jugar> jugars) { 
+        DefaultTableModel modelo = (DefaultTableModel) tblJuego.getModel();
+        modelo.setRowCount(0);
+        for (Jugar jugar1 : jugars) {
+            //System.out.println(jugar1.getApuestas());
+            for (Apostar apostar : jugar1.getApuestas()) {
+                String numeroApostado = "";
+                if(apostar.getNumeroapostado().equalsIgnoreCase("true")){
+                    numeroApostado="par";
+                }else if(apostar.getNumeroapostado().equalsIgnoreCase("false")){
+                    numeroApostado="impar";
+                }else{
+                    numeroApostado= apostar.getNumeroapostado();
+                }
+                apostar.setNumeroapostado(numeroApostado);
+                Object[] rowData = {apostar.getCodigoJugadorFk().getNombre(),apostar.getSaldojugador(),
+                    numeroApostado,apostar.getTipoapuesta(),apostar.getSaldobanca(),apostar.getNumeroganador()};
+                modelo.addRow(rowData);
+            }    
+        } 
+        tblJuego.setModel(modelo);
+    }
+    
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jLabel2 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        btnResivirApuestas = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblApostadores = new javax.swing.JTable();
+        btnIniciarJuego = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblJuego = new javax.swing.JTable();
+        jButton3 = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        JlableNumero = new javax.swing.JLabel();
+
+        setClosable(true);
+        addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+                formInternalFrameActivated(evt);
+            }
+            public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            }
+        });
+
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/ruleta (1).gif"))); // NOI18N
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fichas (1).gif"))); // NOI18N
+
+        btnResivirApuestas.setBackground(new java.awt.Color(0, 0, 0));
+        btnResivirApuestas.setForeground(new java.awt.Color(255, 255, 0));
+        btnResivirApuestas.setText("Resivir Apuestas");
+        btnResivirApuestas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnResivirApuestasActionPerformed(evt);
+            }
+        });
+
+        tblApostadores.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "Codigo", "Nombre", "Tipo de Juego"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(tblApostadores);
+
+        btnIniciarJuego.setBackground(new java.awt.Color(0, 0, 0));
+        btnIniciarJuego.setForeground(new java.awt.Color(255, 255, 0));
+        btnIniciarJuego.setText("Iniciar Juego");
+        btnIniciarJuego.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnIniciarJuegoActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/apuestas-docena.gif"))); // NOI18N
+
+        tblJuego.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "Jugador", "saldo", "Numero Escojido", "Tipo de Juego", "Banca", "Numero Ganador"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane2.setViewportView(tblJuego);
+
+        jButton3.setBackground(new java.awt.Color(0, 0, 0));
+        jButton3.setForeground(new java.awt.Color(255, 255, 0));
+        jButton3.setText("Pausa");
+
+        jLabel4.setText("Numero Ganador");
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(34, 34, 34)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnResivirApuestas)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnIniciarJuego)
+                                .addGap(18, 18, 18)
+                                .addComponent(jButton3))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 306, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 374, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addComponent(jLabel4)
+                            .addGap(18, 18, 18)
+                            .addComponent(JlableNumero, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(425, 425, 425))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 629, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel3))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 344, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(btnResivirApuestas)
+                                    .addComponent(btnIniciarJuego)
+                                    .addComponent(jButton3))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 14, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 344, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(19, 19, 19)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(JlableNumero, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void btnResivirApuestasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResivirApuestasActionPerformed
+        Random numeroRandom = new Random();
+        int numeroJugadores = controladorJugador.findAll().size();
+        int numero = 4;
+        var jugadores = controladorJugador.findAll();
+
+        for (int i = 0; i < numero; i++) {
+
+            int posicion = numeroRandom.nextInt(numeroJugadores);
+            var ju = jugadores.get(posicion);
+            if(jugadores.contains(ju)){
+                ju.setTipoapuesta(EnumTipoDeApuesta.NUMERO.toString());
+                listaJugadores.add(ju);
+                //System.out.println(listaJugadores);
+                listaNumero.add(ju);
+            }else{
+                numero++;
+            }
+        }
+        numero = 4;
+        for (int i = 0; i < numero; i++) {
+
+            int posicion = numeroRandom.nextInt(numeroJugadores);
+            var ju = jugadores.get(posicion);
+            if(jugadores.contains(ju)){
+                ju.setTipoapuesta(EnumTipoDeApuesta.PARIMPAR.toString());
+                listaJugadores.add(ju);
+                //System.out.println(listaJugadores);
+                parImpar.add(ju);
+            }else{
+                numero++;
+            }
+        }
+        numero = 4;
+        for (int i = 0; i < numero; i++) {
+
+            int posicion = numeroRandom.nextInt(numeroJugadores);
+            var ju = jugadores.get(posicion);
+            if(jugadores.contains(ju)){
+                ju.setTipoapuesta(EnumTipoDeApuesta.MARTINGALA.toString());
+                listaJugadores.add(ju);
+                //System.out.println(listaJugadores);
+                martingala.add(ju);
+            }else{
+                numero++;
+            }
+        }
+        
+        cargarDatosApostadores();
+
+    }//GEN-LAST:event_btnResivirApuestasActionPerformed
+
+    private void btnIniciarJuegoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarJuegoActionPerformed
+        boolean continuar = true;
+        int cont =0;
+        Banca banca = controladorBanca.findAll().get(0);
+        int numeroqsalio= sacarNumero();
+        int numeroPartida = controladorApostar.partidas()+1;
+        List<Jugar> listajugarNumero = new ArrayList();
+        List<Jugar> listajugarParImpar = new ArrayList();
+        List<Jugar> listajugarMartingala = new ArrayList();
+        
+        for (int i = 0; i < 4; i++) {
+            listajugarNumero.add(new Jugar(listaNumero.get(i), banca, numeroPartida));
+            listajugarParImpar.add(new Jugar(parImpar.get(i), banca, numeroPartida));
+            listajugarMartingala.add(new Jugar(martingala.get(i), banca, numeroPartida));
+        }
+        
+        while(continuar){
+            if(numeroqsalio != 0 && cont != 2){
+                try{
+                    for (int i = 0; i < 4; i++) {
+                        listaNumero.get(i).setNumeroruleta(String.valueOf(numeroqsalio));
+                        parImpar.get(i).setNumeroruleta(String.valueOf(numeroqsalio));
+                        martingala.get(i).setNumeroruleta(String.valueOf(numeroqsalio));
+                        listajugarNumero.get(i).setNumeroDePartida(numeroPartida);
+                        listajugarParImpar.get(i).setNumeroDePartida(numeroPartida);
+                        listajugarMartingala.get(i).setNumeroDePartida(numeroPartida); 
+                        
+                        jugar.add(listajugarNumero.get(i));
+                        jugar.add(listajugarParImpar.get(i));
+                        jugar.add(listajugarMartingala.get(i));
+                        
+                        Thread hiloNumero = new Thread(listajugarNumero.get(i));
+                        Thread hiloParImpar = new Thread(listajugarParImpar.get(i));
+                        Thread hiloMartingala = new Thread(listajugarMartingala.get(i));
+                        
+                        
+                        
+                        hiloNumero.setName("Jugar " + i + "N");
+                        hiloParImpar.setName("Jugar " + i + "PI");
+                        hiloMartingala.setName("Jugar " + i + "M");
+                        
+                        listaHilos.add(hiloNumero);
+                        listaHilos.add(hiloParImpar);
+                        listaHilos.add(hiloMartingala);
+                        
+                        hiloNumero.start();
+                        hiloParImpar.start();
+                        hiloMartingala.start(); 
+                        
+                    }
+                    numeroPartida++;
+                    cont++;
+                    Thread.sleep(1);
+                    numeroqsalio=sacarNumero();
+                    
+                    cargarDatosJuego(jugar);
+                    
+                }catch(InterruptedException ex){
+                    System.out.println(ex);
+                }
+            }else{
+                continuar=false;
+            }
+        }
+        
+        crearApuesta(jugar);
+        actualizarJugador(jugar);
+        ActualizarBanca(jugar);
+    }//GEN-LAST:event_btnIniciarJuegoActionPerformed
+
+    private void formInternalFrameActivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameActivated
+       
+    }//GEN-LAST:event_formInternalFrameActivated
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel JlableNumero;
+    private javax.swing.JButton btnIniciarJuego;
+    private javax.swing.JButton btnResivirApuestas;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable tblApostadores;
+    private javax.swing.JTable tblJuego;
+    // End of variables declaration//GEN-END:variables
+}
